@@ -1,4 +1,5 @@
 from flask import Flask;
+from flask_cors import CORS
 import pandas as pd;
 import numpy as np;
 import pymysql;
@@ -7,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
-
+CORS(app)
 #------------------------------DB CONFIG------------------------
 
 
