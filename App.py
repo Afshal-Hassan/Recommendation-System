@@ -17,9 +17,7 @@ CORS(app)
 # db = SQLAlchemy(app)
 
 
-engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning').connect()
-data = pd.read_sql_table('test',engine)
-data = data.drop(columns=['id'])
+
 
 
 #-----------------------DB CONFIG END-----------------------------
@@ -42,10 +40,10 @@ def recommend(userName,pt,similarity_score):
 
 @app.route('/<userName>')
 def recommendationSystem(userName):
-
+    
+    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning').connect()
     data = pd.read_sql_table('test',engine)
     
-
     # Label Encoder
 
     category = LabelEncoder()
