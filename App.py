@@ -1,5 +1,5 @@
 from flask import Flask;
-from flask_cors import CORS
+from flask_cors import CORS ,cross_origin
 import pandas as pd;
 import numpy as np;
 import pymysql;
@@ -70,7 +70,12 @@ def recommendationSystem(userName):
     return getUsers
 
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers.add('Access-Control-Allow-Origin', "*")
+    return response
+
 # App Main Start
 
 if(__name__ == "__main__"):
-    app.run(debug=True)
+    app.run()
