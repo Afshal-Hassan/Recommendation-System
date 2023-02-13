@@ -10,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 app = Flask(__name__)
 CORS(app)
+
 #------------------------------DB CONFIG------------------------
 
 
@@ -42,10 +43,9 @@ def recommend(userName,pt,similarity_score):
 @app.route('/<userName>')
 def recommendationSystem(userName):
     
-    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning',poolclass=QueuePool, pool_size=5, max_overflow=0)
-    
+    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning',poolclass=QueuePool, pool_size=5, max_overflow=10)
     conn=engine.connect()
-    
+
     data = pd.read_sql_table('test',conn)
     
     # Label Encoder
@@ -68,10 +68,8 @@ def recommendationSystem(userName):
     # Calling Recommend function
 
     getUsers = recommend(userName,pt,similarity_score)
-    
-    conn.close()
 
-    engine.dispose()
+    conn.close();
 
     return getUsers
 
