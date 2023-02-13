@@ -3,6 +3,7 @@ from flask_cors import CORS ,cross_origin
 import pandas as pd;
 import numpy as np;
 import pymysql;
+from sqlalchemy.pool import QueuePool
 import sqlalchemy;
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics.pairwise import cosine_similarity
@@ -41,8 +42,11 @@ def recommend(userName,pt,similarity_score):
 @app.route('/<userName>')
 def recommendationSystem(userName):
     
-    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning').connect()
-    data = pd.read_sql_table('test',engine)
+    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning',poolclass=QueuePool, pool_size=5, max_overflow=0)
+    
+    conn=engine.connect()
+    
+    data = pd.read_sql_table('test',conn)
     
     # Label Encoder
 
@@ -65,6 +69,10 @@ def recommendationSystem(userName):
 
     getUsers = recommend(userName,pt,similarity_score)
     
+    conn.close()
+
+    engine.dispose()
+
     return getUsers
 
 
