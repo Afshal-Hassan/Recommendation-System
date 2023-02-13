@@ -3,7 +3,10 @@ from flask_cors import CORS ,cross_origin
 import pandas as pd;
 import numpy as np;
 import pymysql;
+import mysql
+import mysql.connector
 from sqlalchemy.pool import QueuePool
+from sqlalchemy import text
 import sqlalchemy;
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics.pairwise import cosine_similarity
@@ -42,34 +45,55 @@ def recommend(userName,pt,similarity_score):
 
 @app.route('/<userName>')
 def recommendationSystem(userName):
-    
-    engine = sqlalchemy.create_engine('mysql+pymysql://afshal:afshal123.@database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com:3306/machine_learning',poolclass=QueuePool, pool_size=5, max_overflow=10)
-    conn=engine.connect()
 
-    data = pd.read_sql_table('test',conn)
+    conn = mysql.connector.connect(
+        host="database-1.cqseadaorxhc.ap-south-1.rds.amazonaws.com",
+        user="afshal",
+        password="afshal123.",
+        database="machine_learning"
+    )
+
+
+    query = '''SELECT * from test'''
+
+
+    cur = conn.cursor()
+    cur.execute(query)
+    result = cur.fetchall()
+
+
+
+    data = pd.DataFrame(result,columns=['id', 'user', 'interest', 'category'])
     
+
+    cur.close()
+    conn.close()
+
+
     # Label Encoder
 
     category = LabelEncoder()
-    data['category'] = category.fit_transform(data['category'])+1
+    data['category'] = category.fit_transform(data['category']) + 1
+
     
     # pivot table
 
     pt = data.pivot_table(index='user',columns='interest',values='category');
+
     
     # Fill NaN to 0
 
     pt.fillna(0,inplace=True)
 
+
     # Calculating Similarity Score with cosine similarity
 
     similarity_score = cosine_similarity(pt)
 
+
     # Calling Recommend function
 
     getUsers = recommend(userName,pt,similarity_score)
-
-    conn.close();
 
     return getUsers
 
@@ -82,4 +106,4 @@ def add_cors_headers(response):
 # App Main Start
 
 if(__name__ == "__main__"):
-    app.run()
+    app.run(debug=True)
