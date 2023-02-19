@@ -35,7 +35,7 @@ def recommend(userName,pt,similarity_score):
     similar_items = sorted(list(enumerate(similarity_score[index])),key=lambda x:x[1],reverse=True)[0:100];
     
     for i in similar_items:
-        if(i[1] > 0.5):
+        if(i[1] > 0.1):
             if(pt.index[i[0]] == userName):
                 continue;
             else:
